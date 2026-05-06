@@ -1,0 +1,23 @@
+# Domain-routed review ownership. Github reads this from /CODEOWNERS, /.github/CODEOWNERS, or /docs/CODEOWNERS.
+# `tools/boundary/check_boundaries.py` parses it as the source of truth for layer (b) of boundary enforcement.
+
+# Default — platform team gets ping if nothing else matches.
+*                       @org/team-platform
+
+# Frontend domains
+/apps/storefront/       @org/team-shopping
+/apps/admin-console/    @org/team-ops
+
+# Backend domains
+/apps/catalog-service/  @org/team-catalog
+/apps/orders-service/   @org/team-orders
+
+# Shared libraries — co-owned so changes get the right eyes.
+/libs/ui-kit/           @org/team-design-system @org/team-shopping @org/team-ops
+/libs/common-domain/    @org/team-platform @org/team-catalog @org/team-orders
+
+# Tooling and CI
+/tools/                 @org/team-platform
+/.github/               @org/team-platform
+/MODULE.bazel           @org/team-platform
+/.bazelrc               @org/team-platform

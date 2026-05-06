@@ -1,0 +1,34 @@
+"""MCP server exposing build/test/affected/run/owners/list_projects for agents.
+
+Packaged as a js_binary so agents can launch it via `bazel run`. The repo root
+is passed as an env var so the server can resolve project paths.
+"""
+
+load("@aspect_rules_js//js:defs.bzl", "js_binary", "js_library")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
+
+ts_project(
+    name = "mcp_server_lib",
+    srcs = glob(["src/**/*.ts"]),
+    declaration = True,
+    tsconfig = "tsconfig.json",
+    deps = [
+        "//:node_modules/@modelcontextprotocol/sdk",
+        "//:node_modules/@types/node",
+        "//:node_modules/zod",
+    ],
+)
+
+js_binary(
+    name = "mcp-server",
+    chdir = package_name(),
+    data = [":mcp_server_lib"],
+    entry_point = "src/index.js",
+    visibility = ["//visibility:public"],
+)
+
+js_library(
+    name = "lib",
+    srcs = [":mcp_server_lib"],
+    visibility = ["//visibility:public"],
+)

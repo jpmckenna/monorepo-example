@@ -1,0 +1,73 @@
+name: pr
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: pr-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  affected:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache bazel disk
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/bazel
+          key: bazel-${{ runner.os }}-${{ hashFiles('MODULE.bazel.lock', 'pnpm-lock.yaml', 'third_party/maven_install.json') }}
+          restore-keys: |
+            bazel-${{ runner.os }}-
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      - name: Install bazel-diff
+        run: |
+          curl -L -o /usr/local/bin/bazel-diff \
+            https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
+          chmod +x /usr/local/bin/bazel-diff
+
+      - name: Compute affected targets
+        id: affected
+        run: |
+          set -euo pipefail
+          targets=$(java -jar /usr/local/bin/bazel-diff \
+            -w "$(pwd)" \
+            -b "$(command -v bazel)" \
+            -sb "origin/${{ github.base_ref }}" \
+            -fb HEAD \
+            --output_targets || true)
+          echo "$targets" > impacted_targets.txt
+          echo "count=$(wc -l < impacted_targets.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Test affected
+        if: steps.affected.outputs.count != '0'
+        env:
+          BB_KEY: ${{ secrets.BB_KEY }}
+        run: |
+          if [ -n "$BB_KEY" ]; then
+            bazel test \
+              --remote_cache=grpcs://remote.buildbuddy.io \
+              --remote_header=x-buildbuddy-api-key="$BB_KEY" \
+              --target_pattern_file=impacted_targets.txt
+          else
+            bazel test --target_pattern_file=impacted_targets.txt
+          fi

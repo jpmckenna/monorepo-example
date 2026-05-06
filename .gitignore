@@ -1,0 +1,15 @@
+bazel-*
+.bazelrc.user
+
+node_modules/
+**/dist/
+**/build/
+**/target/
+*.tsbuildinfo
+
+.idea/
+.vscode/
+*.iml
+.bazelproject
+
+.DS_Store

@@ -1,0 +1,56 @@
+"""monorepo-example — Bazel POC for an enterprise React + Spring Boot org."""
+
+module(
+    name = "monorepo_example",
+    version = "0.1.0",
+    compatibility_level = 1,
+)
+
+bazel_dep(name = "aspect_rules_js",     version = "3.1.1")
+bazel_dep(name = "aspect_rules_ts",     version = "3.6.0")
+bazel_dep(name = "rules_nodejs",        version = "6.3.5")
+bazel_dep(name = "rules_jvm_external",  version = "6.10")
+bazel_dep(name = "rules_java",          version = "8.6.1")
+bazel_dep(name = "rules_oci",           version = "2.3.0")
+bazel_dep(name = "rules_pkg",           version = "1.0.1")
+bazel_dep(name = "contrib_rules_jvm",   version = "0.27.0")
+bazel_dep(name = "aspect_bazel_lib",    version = "2.10.0")
+bazel_dep(name = "rules_spring",        version = "2.6.3")
+bazel_dep(name = "buildifier_prebuilt", version = "8.0.3", dev_dependency = True)
+
+# --- Node / pnpm ---------------------------------------------------------------
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm.npm_translate_lock(
+    name = "npm",
+    pnpm_lock = "//:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "npm")
+
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+use_repo(pnpm, "pnpm")
+
+# --- Java / Maven --------------------------------------------------------------
+
+SPRING_BOOT_VERSION = "3.3.4"
+
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    artifacts = [
+        "org.springframework.boot:spring-boot-starter-web:%s" % SPRING_BOOT_VERSION,
+        "org.springframework.boot:spring-boot-starter-actuator:%s" % SPRING_BOOT_VERSION,
+        "org.springframework.boot:spring-boot-starter-test:%s" % SPRING_BOOT_VERSION,
+        "org.springframework.boot:spring-boot-loader:%s" % SPRING_BOOT_VERSION,
+        "org.junit.jupiter:junit-jupiter-api:5.11.3",
+        "org.junit.jupiter:junit-jupiter-engine:5.11.3",
+        "org.junit.platform:junit-platform-launcher:1.11.3",
+    ],
+    repositories = [
+        "https://repo1.maven.org/maven2",
+        "https://repo.spring.io/release",
+    ],
+    fetch_sources = True,
+    lock_file = "//third_party:maven_install.json",
+)
+use_repo(maven, "maven")

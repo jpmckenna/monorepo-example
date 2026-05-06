@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init *)",
+      "Bash(git branch *)",
+      "Bash(chmod +x /Users/john/git/monorepo-example/tools/boundary/check_boundaries.py)"
+    ]
+  }
+}

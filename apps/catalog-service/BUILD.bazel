@@ -1,0 +1,43 @@
+"""Catalog service — Spring Boot 3, JDK 21.
+
+Domain: catalog. May depend on //libs/common-domain only. Visibility prevents
+direct deps on other apps; layer (c) of the boundary check (Python script)
+catches transitive source imports past re-exports.
+"""
+
+load("@contrib_rules_jvm//java:defs.bzl", "java_test_suite")
+load("@rules_java//java:defs.bzl", "java_library")
+load("@rules_spring//springboot:springboot.bzl", "springboot")
+
+java_library(
+    name = "catalog_lib",
+    srcs = glob(["src/main/java/**/*.java"]),
+    resources = glob(["src/main/resources/**"]),
+    visibility = ["//apps/catalog-service:__subpackages__"],
+    deps = [
+        "//libs/common-domain",
+        "@maven//:org_springframework_boot_spring_boot_starter_actuator",
+        "@maven//:org_springframework_boot_spring_boot_starter_web",
+    ],
+)
+
+springboot(
+    name = "catalog-service",
+    boot_app_class = "com.example.catalog.CatalogApplication",
+    # Boot 3 launcher — default is Boot 2 and silently produces a jar that fails
+    # at `java -jar` time. See risks section of the plan.
+    boot_launcher_class = "org.springframework.boot.loader.launch.JarLauncher",
+    java_library = ":catalog_lib",
+    visibility = ["//visibility:public"],
+)
+
+java_test_suite(
+    name = "tests",
+    size = "small",
+    srcs = glob(["src/test/java/**/*.java"]),
+    runner = "junit5",
+    deps = [
+        ":catalog_lib",
+        "@maven//:org_springframework_boot_spring_boot_starter_test",
+    ],
+)

@@ -1,0 +1,52 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache bazel disk
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/bazel
+          key: bazel-${{ runner.os }}-${{ hashFiles('MODULE.bazel.lock', 'pnpm-lock.yaml', 'third_party/maven_install.json') }}
+          restore-keys: |
+            bazel-${{ runner.os }}-
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: pnpm install
+        run: pnpm install --frozen-lockfile
+
+      - name: bazel test //...
+        env:
+          BB_KEY: ${{ secrets.BB_KEY }}
+        run: |
+          if [ -n "$BB_KEY" ]; then
+            bazel test //... \
+              --remote_cache=grpcs://remote.buildbuddy.io \
+              --remote_header=x-buildbuddy-api-key="$BB_KEY" \
+              --bes_backend=grpcs://remote.buildbuddy.io \
+              --bes_results_url=https://app.buildbuddy.io/invocation/
+          else
+            bazel test //... --noremote_cache --nobes_backend
+          fi

@@ -1,0 +1,59 @@
+# Lefthook config — pre-commit and pre-push verification.
+# Install:  brew install lefthook && lefthook install
+
+pre-commit:
+  parallel: true
+  commands:
+    buildifier:
+      glob: "{BUILD,BUILD.bazel,*.bzl,WORKSPACE,MODULE.bazel}"
+      run: bazel run //:buildifier.fix -- {staged_files}
+      stage_fixed: true
+
+    prettier:
+      glob: "*.{ts,tsx,js,json,md,yml,yaml}"
+      run: pnpm exec prettier --write {staged_files}
+      stage_fixed: true
+
+    google-java-format:
+      glob: "*.java"
+      run: |
+        if ! command -v google-java-format >/dev/null 2>&1; then
+          echo "google-java-format not found — install with: brew install google-java-format"
+          exit 1
+        fi
+        google-java-format --replace {staged_files}
+      stage_fixed: true
+
+    boundary-check:
+      run: python3 tools/boundary/check_boundaries.py --staged
+
+pre-push:
+  commands:
+    affected-tests:
+      run: |
+        set -euo pipefail
+        if ! command -v bazel-diff >/dev/null 2>&1; then
+          echo "bazel-diff not installed — skipping affected-only tests."
+          echo "Install: https://github.com/Tinder/bazel-diff"
+          exit 0
+        fi
+        targets=$(bazel-diff -w "$(pwd)" \
+          -b "$(command -v bazelisk || command -v bazel)" \
+          -sb "$(git rev-parse origin/main)" \
+          -fb HEAD \
+          --output_targets || true)
+        if [ -z "$targets" ]; then
+          echo "No affected targets."
+          exit 0
+        fi
+        echo "$targets" | xargs bazel test --
+
+    maven-pin-fresh:
+      run: |
+        if [ -f third_party/maven_install.json ]; then
+          if ! git diff --quiet -- third_party/maven_install.json MODULE.bazel; then
+            echo "MODULE.bazel or maven_install.json changed but lockfile not re-pinned."
+            echo "Run: bazel run @maven//:pin"
+            exit 1
+          fi
+        fi

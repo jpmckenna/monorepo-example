@@ -1,0 +1,9 @@
+"""Boundary lint files. The script is invoked via plain `python3` from lefthook
+and CI (no Bazel runtime dep) so we just expose the source for buildifier and
+let `tools/mcp-server` reference it via repo-relative paths.
+"""
+
+exports_files([
+    "boundaries.yml",
+    "check_boundaries.py",
+])

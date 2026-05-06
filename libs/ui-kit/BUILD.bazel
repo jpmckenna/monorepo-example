@@ -1,0 +1,21 @@
+"""Shared React/TS design system.
+
+Visibility is narrow — frontend apps only. Cannot be pulled into the JVM side
+(it would not compile there anyway, but the visibility makes the intent loud).
+"""
+
+load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
+
+ts_project(
+    name = "ui-kit",
+    srcs = glob(["src/**/*.ts"]) + glob(["src/**/*.tsx"]),
+    declaration = True,
+    tsconfig = "tsconfig.json",
+    visibility = [
+        "//apps/admin-console:__subpackages__",
+        "//apps/storefront:__subpackages__",
+    ],
+    deps = [
+        "//:node_modules/react",
+    ],
+)

@@ -1,0 +1,59 @@
+"""Root BUILD file. Defines domain package_groups used for boundary enforcement.
+
+A package_group lets us name a domain (e.g. shopping, catalog) and then list
+those names in `visibility = [...]` on individual targets. A direct cross-domain
+`deps` then fails `bazel build` with a visibility error — layer (a) of the
+3-layer boundary enforcement story documented in CLAUDE.md.
+"""
+
+package(default_visibility = ["//visibility:private"])
+
+package_group(
+    name = "domain_shopping",
+    packages = [
+        "//apps/storefront/...",
+        "//apps/admin-console/...",
+    ],
+)
+
+package_group(
+    name = "domain_catalog",
+    packages = ["//apps/catalog-service/..."],
+)
+
+package_group(
+    name = "domain_orders",
+    packages = ["//apps/orders-service/..."],
+)
+
+package_group(
+    name = "shared_frontend",
+    packages = ["//libs/ui-kit/..."],
+)
+
+package_group(
+    name = "shared_backend",
+    packages = ["//libs/common-domain/..."],
+)
+
+# pnpm workspace root — exposes :node_modules/<pkg> labels for ts_project deps.
+load("@aspect_rules_js//npm:defs.bzl", "npm_link_all_packages")
+
+npm_link_all_packages(name = "node_modules")
+
+# Buildifier — formats/lints all BUILD files in the repo.
+load("@buildifier_prebuilt//:rules.bzl", "buildifier")
+
+buildifier(
+    name = "buildifier.check",
+    exclude_patterns = ["./.git/*"],
+    lint_mode = "warn",
+    mode = "diff",
+)
+
+buildifier(
+    name = "buildifier.fix",
+    exclude_patterns = ["./.git/*"],
+    lint_mode = "fix",
+    mode = "fix",
+)

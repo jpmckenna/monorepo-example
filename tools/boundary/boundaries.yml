@@ -1,0 +1,35 @@
+# Allowed cross-domain dependency edges. Read by check_boundaries.py.
+# Format: each domain lists which domains it may depend on (transitively, in
+# source). Anything not listed is forbidden and fails CI.
+#
+# Domains correspond 1:1 with the package_groups in //:BUILD.bazel.
+
+domains:
+  domain_shopping:
+    paths:
+      - apps/storefront/
+      - apps/admin-console/
+    may_depend_on:
+      - shared_frontend
+
+  domain_catalog:
+    paths:
+      - apps/catalog-service/
+    may_depend_on:
+      - shared_backend
+
+  domain_orders:
+    paths:
+      - apps/orders-service/
+    may_depend_on:
+      - shared_backend
+
+  shared_frontend:
+    paths:
+      - libs/ui-kit/
+    may_depend_on: []
+
+  shared_backend:
+    paths:
+      - libs/common-domain/
+    may_depend_on: []

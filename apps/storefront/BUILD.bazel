@@ -1,0 +1,57 @@
+"""Customer-facing storefront — React + TS + Vite.
+
+Domain: shopping. Allowed deps: //libs/ui-kit and the React npm packages.
+Forbidden: any //apps/* peer, //libs/common-domain (JVM-only).
+"""
+
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
+load("@npm//:vite/package_json.bzl", vite_bin = "bin")
+
+ts_project(
+    name = "storefront_lib",
+    srcs = glob(
+        include = [
+            "src/**/*.ts",
+            "src/**/*.tsx",
+        ],
+    ),
+    declaration = True,
+    tsconfig = "tsconfig.json",
+    visibility = ["//apps/storefront:__subpackages__"],
+    deps = [
+        "//:node_modules/react",
+        "//:node_modules/react-dom",
+        "//libs/ui-kit",
+    ],
+)
+
+js_library(
+    name = "vite_inputs",
+    srcs = [
+        "index.html",
+        "vite.config.ts",
+    ] + glob(["public/**/*"]),
+    visibility = ["//apps/storefront:__subpackages__"],
+)
+
+vite_bin.vite_binary(
+    name = "dev",
+    args = ["dev"],
+    chdir = package_name(),
+    data = [
+        ":storefront_lib",
+        ":vite_inputs",
+    ],
+)
+
+vite_bin.vite_binary(
+    name = "build",
+    args = ["build"],
+    chdir = package_name(),
+    data = [
+        ":storefront_lib",
+        ":vite_inputs",
+    ],
+    out_dirs = ["dist"],
+)

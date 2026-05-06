@@ -1,0 +1,40 @@
+"""Orders service — Spring Boot 3, JDK 21.
+
+Domain: orders. May depend on //libs/common-domain only. Mirrors catalog-service
+in structure; lives in a separate domain to demonstrate cross-domain isolation.
+"""
+
+load("@contrib_rules_jvm//java:defs.bzl", "java_test_suite")
+load("@rules_java//java:defs.bzl", "java_library")
+load("@rules_spring//springboot:springboot.bzl", "springboot")
+
+java_library(
+    name = "orders_lib",
+    srcs = glob(["src/main/java/**/*.java"]),
+    resources = glob(["src/main/resources/**"]),
+    visibility = ["//apps/orders-service:__subpackages__"],
+    deps = [
+        "//libs/common-domain",
+        "@maven//:org_springframework_boot_spring_boot_starter_actuator",
+        "@maven//:org_springframework_boot_spring_boot_starter_web",
+    ],
+)
+
+springboot(
+    name = "orders-service",
+    boot_app_class = "com.example.orders.OrdersApplication",
+    boot_launcher_class = "org.springframework.boot.loader.launch.JarLauncher",
+    java_library = ":orders_lib",
+    visibility = ["//visibility:public"],
+)
+
+java_test_suite(
+    name = "tests",
+    size = "small",
+    srcs = glob(["src/test/java/**/*.java"]),
+    runner = "junit5",
+    deps = [
+        ":orders_lib",
+        "@maven//:org_springframework_boot_spring_boot_starter_test",
+    ],
+)
