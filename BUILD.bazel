@@ -37,7 +37,7 @@ package_group(
 )
 
 # pnpm workspace root — exposes :node_modules/<pkg> labels for ts_project deps.
-load("@aspect_rules_js//npm:defs.bzl", "npm_link_all_packages")
+load("@npm//:defs.bzl", "npm_link_all_packages")
 
 npm_link_all_packages(name = "node_modules")
 

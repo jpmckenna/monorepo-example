@@ -16,7 +16,7 @@ should buy you:
 
 ## Stack
 
-- **Bazel 9.1.0** with bzlmod (`MODULE.bazel`)
+- **Bazel 7.4.1** with bzlmod (`MODULE.bazel`)
 - **`aspect_rules_js`** + **`aspect_rules_ts`** for the React/TS apps and libs (pnpm-backed)
 - **`rules_spring`** (Salesforce) for Spring Boot 3 fat-jars
 - **`rules_jvm_external`** for Maven dependency resolution

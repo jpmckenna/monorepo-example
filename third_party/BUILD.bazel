@@ -1,0 +1,3 @@
+"""Third-party lockfiles and generated artifacts."""
+
+exports_files(["maven_install.json"])

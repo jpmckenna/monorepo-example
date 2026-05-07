@@ -4,10 +4,11 @@ Domain: ops. Mirrors storefront but is a peer, not a sibling — they share only
 //libs/ui-kit and pnpm packages.
 """
 
-load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@aspect_rules_js//js:defs.bzl", "js_library", "js_run_binary")
 load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
 load("@npm//:vite/package_json.bzl", vite_bin = "bin")
 
+# ts_project provides type-checking and .d.ts generation; Vite handles bundling.
 ts_project(
     name = "admin_console_lib",
     srcs = glob(
@@ -22,15 +23,27 @@ ts_project(
     deps = [
         "//:node_modules/react",
         "//:node_modules/react-dom",
-        "//libs/ui-kit",
+        "//:node_modules/@types/react",
+        "//:node_modules/@types/react-dom",
+        "//:node_modules/@monorepo-example/ui-kit",
     ],
 )
 
+# vite_inputs bundles everything Vite needs: HTML, config, TS sources, and npm deps.
 js_library(
     name = "vite_inputs",
     srcs = [
         "index.html",
         "vite.config.ts",
+    ] + glob(["src/**/*.ts", "src/**/*.tsx"]),
+    deps = [
+        "//:node_modules/react",
+        "//:node_modules/react-dom",
+        "//:node_modules/@types/react",
+        "//:node_modules/@types/react-dom",
+        "//:node_modules/@monorepo-example/ui-kit",
+        "//:node_modules/vite",
+        "//:node_modules/@vitejs/plugin-react",
     ],
     visibility = ["//apps/admin-console:__subpackages__"],
 )
@@ -40,17 +53,24 @@ vite_bin.vite_binary(
     args = ["dev"],
     chdir = package_name(),
     data = [
-        ":admin_console_lib",
         ":vite_inputs",
     ],
 )
 
 vite_bin.vite_binary(
-    name = "build",
-    args = ["build"],
+    name = "_vite_build_bin",
     chdir = package_name(),
     data = [
-        ":admin_console_lib",
+        ":vite_inputs",
+    ],
+)
+
+js_run_binary(
+    name = "build",
+    tool = ":_vite_build_bin",
+    args = ["build"],
+    chdir = package_name(),
+    srcs = [
         ":vite_inputs",
     ],
     out_dirs = ["dist"],

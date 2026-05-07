@@ -11,8 +11,23 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\""
   },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "@monorepo-example/ui-kit": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zod": "^3.23.8"
+  },
   "devDependencies": {
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
     "prettier": "^3.3.3",
-    "typescript": "^5.6.3"
+    "typescript": "5.6.2",
+    "vite": "^5.4.10"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
   }
 }

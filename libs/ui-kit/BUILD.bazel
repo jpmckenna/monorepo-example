@@ -4,6 +4,7 @@ Visibility is narrow — frontend apps only. Cannot be pulled into the JVM side
 (it would not compile there anyway, but the visibility makes the intent loud).
 """
 
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
 
 ts_project(
@@ -11,11 +12,19 @@ ts_project(
     srcs = glob(["src/**/*.ts"]) + glob(["src/**/*.tsx"]),
     declaration = True,
     tsconfig = "tsconfig.json",
-    visibility = [
-        "//apps/admin-console:__subpackages__",
-        "//apps/storefront:__subpackages__",
-    ],
     deps = [
         "//:node_modules/react",
+        "//:node_modules/@types/react",
     ],
+)
+
+# Exposes this workspace package so npm_translate_lock can link it as
+# //:node_modules/@monorepo-example/ui-kit in consuming apps.
+npm_package(
+    name = "pkg",
+    srcs = [
+        "package.json",
+        ":ui-kit",
+    ],
+    visibility = ["//visibility:public"],
 )

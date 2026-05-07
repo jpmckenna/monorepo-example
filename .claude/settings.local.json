@@ -3,7 +3,19 @@
     "allow": [
       "Bash(git init *)",
       "Bash(git branch *)",
-      "Bash(chmod +x /Users/john/git/monorepo-example/tools/boundary/check_boundaries.py)"
+      "Bash(chmod +x /Users/john/git/monorepo-example/tools/boundary/check_boundaries.py)",
+      "Bash(bazel build *)",
+      "Bash(bazel query *)",
+      "Bash(ls /private/var/tmp/_bazel_john/f854b2a8b8ad7aa6157690be0758991e/external/npm/ 2>/dev/null | head -20 *)",
+      "Bash(find ~/.cache/bazel -name \"BUILD.bazel\" -path \"*monorepo*\" 2>/dev/null | head -5 *)",
+      "Bash(pnpm install *)",
+      "Bash(bazel fetch *)",
+      "Bash(grep -E \"spring_boot_autoconfigure|spring_boot$|spring_web$|spring_context|spring_framework_bom\")",
+      "Bash(grep -E \"^@maven//:org_springframework_boot_spring_boot$|^@maven//:org_springframework_spring_webmvc$\")",
+      "Bash(grep -E \"spring_boot_test_autoconfigure|spring_beans$|spring_test$|junit_jupiter_api$|spring_web$\")",
+      "Bash(grep -v \"extension\\\\|sources\\\\|[0-9]_[0-9]$\")",
+      "Bash(bazel test *)",
+      "Bash(bazel run *)"
     ]
   }
 }

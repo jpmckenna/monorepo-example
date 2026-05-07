@@ -16,8 +16,12 @@ java_library(
     visibility = ["//apps/catalog-service:__subpackages__"],
     deps = [
         "//libs/common-domain",
+        "@maven//:org_springframework_boot_spring_boot",
+        "@maven//:org_springframework_boot_spring_boot_autoconfigure",
         "@maven//:org_springframework_boot_spring_boot_starter_actuator",
         "@maven//:org_springframework_boot_spring_boot_starter_web",
+        "@maven//:org_springframework_spring_web",
+        "@maven//:org_springframework_spring_webmvc",
     ],
 )
 
@@ -38,6 +42,14 @@ java_test_suite(
     runner = "junit5",
     deps = [
         ":catalog_lib",
+        "@maven//:org_junit_jupiter_junit_jupiter_api",
+        "@maven//:org_junit_jupiter_junit_jupiter_engine",
+        "@maven//:org_junit_platform_junit_platform_launcher",
+        "@maven//:org_junit_platform_junit_platform_reporting",
+        "@maven//:org_springframework_boot_spring_boot_test_autoconfigure",
         "@maven//:org_springframework_boot_spring_boot_starter_test",
+        "@maven//:org_springframework_spring_beans",
+        "@maven//:org_springframework_spring_test",
+        "@maven//:org_springframework_spring_web",
     ],
 )
