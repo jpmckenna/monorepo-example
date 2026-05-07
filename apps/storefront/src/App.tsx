@@ -9,7 +9,17 @@ export function App() {
   useEffect(() => {
     fetchProduct("ABC-123")
       .then(setProduct)
-      .catch((e) => setError(String(e)));
+      .catch((e: unknown) => {
+        // fetch() rejects with TypeError on network failure in all browsers
+        // (Chrome: "Failed to fetch", Safari: "Load failed", Firefox: "NetworkError...")
+        setError(
+          e instanceof TypeError
+            ? "Could not reach catalog-service. Is it running? (bazel run //apps/catalog-service)"
+            : e instanceof Error
+              ? e.message
+              : String(e)
+        );
+      });
   }, []);
 
   return (

@@ -49,7 +49,7 @@ Every project ships its own `CLAUDE.md`, `OWNERS`, and `BUILD.bazel`.
 
 ```bash
 # One-time setup
-brew install bazelisk pnpm lefthook
+brew install bazelisk pnpm lefthook graphviz
 pnpm install
 bazel run @maven//:pin
 lefthook install

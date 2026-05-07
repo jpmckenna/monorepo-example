@@ -15,7 +15,8 @@
       "Bash(grep -E \"spring_boot_test_autoconfigure|spring_beans$|spring_test$|junit_jupiter_api$|spring_web$\")",
       "Bash(grep -v \"extension\\\\|sources\\\\|[0-9]_[0-9]$\")",
       "Bash(bazel test *)",
-      "Bash(bazel run *)"
+      "Bash(bazel run *)",
+      "Bash(kill %1)"
     ]
   }
 }

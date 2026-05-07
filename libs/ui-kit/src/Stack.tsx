@@ -13,6 +13,7 @@ export function Stack({ children, direction = "column", gap = 8 }: StackProps) {
         display: "flex",
         flexDirection: direction,
         gap: `${gap}px`,
+        alignItems: "flex-start",
       }}
     >
       {children}
