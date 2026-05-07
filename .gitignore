@@ -13,3 +13,4 @@ node_modules/
 .bazelproject
 
 .DS_Store
+.vite-cache/
