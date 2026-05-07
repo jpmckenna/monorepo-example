@@ -53,6 +53,7 @@ jobs:
         env:
           BB_KEY: ${{ secrets.BB_KEY }}
         run: |
+          set +e
           if [ -n "$BB_KEY" ]; then
             bazel test \
               --remote_cache=grpcs://remote.buildbuddy.io \
@@ -61,3 +62,9 @@ jobs:
           else
             bazel test --target_pattern_file=impacted_targets.txt
           fi
+          exit_code=$?
+          if [ $exit_code -eq 4 ]; then
+            echo "No tests found in affected targets. Skipping."
+            exit 0
+          fi
+          exit $exit_code
