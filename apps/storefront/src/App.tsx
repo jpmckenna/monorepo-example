@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Stack } from "@monorepo-example/ui-kit";
+// @ts-expect-error - testing boundary violation
+import type { CreateOrderRequest } from "../../orders-service/src/main/java/com/example/orders/web/OrderController.java";
 import { fetchProduct, type Product } from "./api/catalog";
 
 export function App() {

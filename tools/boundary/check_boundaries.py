@@ -104,10 +104,9 @@ def find_violations(domains: dict) -> list[tuple[str, str, str]]:
                     text=True,
                     stderr=subprocess.DEVNULL,
                 )
-            except (FileNotFoundError, subprocess.CalledProcessError):
-                # Bazel may not be available in pre-commit; fall back to a
-                # purely path-based scan of source files in the diff.
-                continue
+            except (FileNotFoundError, subprocess.CalledProcessError) as e:
+                print(f"Error running bazel query for {domain}: {e}", file=sys.stderr)
+                sys.exit(1)
             for label in out.splitlines():
                 if not label.startswith("//"):
                     continue
@@ -133,7 +132,8 @@ def main() -> int:
     violations = find_violations(domains)
     if diff is not None:
         diff_set = set(diff)
-        violations = [v for v in violations if v[2] in diff_set]
+        modified_domains = {domain_for_path(p, domains) for p in diff_set}
+        violations = [v for v in violations if v[0] in modified_domains]
 
     if not violations:
         print("boundary check: OK")

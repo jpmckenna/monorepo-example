@@ -26,6 +26,7 @@ ts_project(
         "//:node_modules/@types/react",
         "//:node_modules/@types/react-dom",
         "//:node_modules/@monorepo-example/ui-kit",
+        "//apps/orders-service:orders_lib",
     ],
 )
 
