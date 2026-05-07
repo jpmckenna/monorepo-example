@@ -132,7 +132,8 @@ def main() -> int:
     violations = find_violations(domains)
     if diff is not None:
         diff_set = set(diff)
-        violations = [v for v in violations if v[2] in diff_set]
+        modified_domains = {domain_for_path(p, domains) for p in diff_set}
+        violations = [v for v in violations if v[0] in modified_domains]
 
     if not violations:
         print("boundary check: OK")
