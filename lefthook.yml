@@ -42,7 +42,14 @@ pre-push:
           echo "No affected targets."
           exit 0
         fi
+        set +e
         echo "$targets" | xargs bazel test --
+        exit_code=$?
+        if [ $exit_code -eq 4 ]; then
+          echo "No tests found in affected targets. Skipping."
+          exit 0
+        fi
+        exit $exit_code
 
     maven-pin-fresh:
       run: |
