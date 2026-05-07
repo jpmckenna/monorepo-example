@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Stack } from "@monorepo-example/ui-kit";
+import { Button, Stack, StockBadge } from "@monorepo-example/ui-kit";
 import { fetchProduct, type Product } from "./api/catalog";
 
 export function App() {
@@ -30,6 +30,7 @@ export function App() {
         {product && (
           <p>
             <strong>{product.sku}</strong> — {product.price} {product.currency}
+            <span style={{ marginLeft: "1rem" }}><StockBadge count={product.inventoryCount} /></span>
           </p>
         )}
         <Button onClick={() => alert("placeholder")}>Add to cart</Button>
