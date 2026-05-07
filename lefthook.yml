@@ -16,12 +16,7 @@ pre-commit:
 
     google-java-format:
       glob: "*.java"
-      run: |
-        if ! command -v google-java-format >/dev/null 2>&1; then
-          echo "google-java-format not found — install with: brew install google-java-format"
-          exit 1
-        fi
-        google-java-format --replace {staged_files}
+      run: bazel run @maven//:com_google_googlejavaformat_google_java_format -- --replace {staged_files}
       stage_fixed: true
 
     boundary-check:
@@ -37,9 +32,10 @@ pre-push:
           echo "Install: https://github.com/Tinder/bazel-diff"
           exit 0
         fi
+        git fetch origin main || true
         targets=$(bazel-diff -w "$(pwd)" \
           -b "$(command -v bazelisk || command -v bazel)" \
-          -sb "$(git rev-parse origin/main)" \
+          -sb "$(git merge-base HEAD origin/main)" \
           -fb HEAD \
           --output_targets || true)
         if [ -z "$targets" ]; then

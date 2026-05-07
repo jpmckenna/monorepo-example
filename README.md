@@ -12,7 +12,7 @@ should buy you:
    cross-domain boundary lint. Three layers, all visible in CI.
 3. **Build acceleration** — incremental + remote cache wins on a polyglot
    graph; affected-only CI on PRs.
-4. **Agentic-development readiness** — per-project `CLAUDE.md`, an MCP server
+4. **Agentic-development readiness** — per-project `AGENTS.md`, an MCP server
    wrapping standard build/test/run tasks, and ownership/visibility constraints
    that contain agent edits.
 
@@ -43,7 +43,7 @@ tools/
   mcp-server/         MCP server exposing build/test/affected/run
 ```
 
-Every project ships its own `CLAUDE.md`, `OWNERS`, and `BUILD.bazel`.
+Every project ships its own `AGENTS.md`, `OWNERS`, and `BUILD.bazel`.
 
 ## Getting started
 
@@ -253,14 +253,14 @@ A typical agent flow looks like:
 ProductControllerTest.returnsKnownProduct          ✓
 ProductControllerTest.returnsNotFoundForUnknownSku ✗  expected 404, got 500
 
-(agent reads CLAUDE.md and the failing test; edits ProductController.java)
+(agent reads AGENTS.md and the failing test; edits ProductController.java)
 
 > test({ target: "//apps/catalog-service:tests" })
 all tests pass
 ```
 
 If the agent ever tries `run({ target: "//apps/orders-service" })` from a
-catalog task, the allowlist parsed from `apps/catalog-service/CLAUDE.md`
+catalog task, the allowlist parsed from `apps/catalog-service/AGENTS.md`
 rejects it. And even if the agent bypassed the MCP server entirely,
 visibility (layer a) and the boundary check (layer c) would still block a
 cross-domain edit before merge.
@@ -375,7 +375,7 @@ managers can point to actual minute-savings per merge.
 | (b) | `CODEOWNERS` + GitHub branch-protection required reviewers | Human review escalation |
 | (c) | `tools/boundary/check_boundaries.py` over `bazel query` output | Transitive source imports past re-exports |
 
-See `CLAUDE.md` for the agent-facing version.
+See `AGENTS.md` for the agent-facing version.
 
 ## CI
 

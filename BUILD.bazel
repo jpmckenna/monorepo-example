@@ -3,7 +3,7 @@
 A package_group lets us name a domain (e.g. shopping, catalog) and then list
 those names in `visibility = [...]` on individual targets. A direct cross-domain
 `deps` then fails `bazel build` with a visibility error — layer (a) of the
-3-layer boundary enforcement story documented in CLAUDE.md.
+3-layer boundary enforcement story documented in AGENTS.md.
 """
 
 package(default_visibility = ["//visibility:private"])

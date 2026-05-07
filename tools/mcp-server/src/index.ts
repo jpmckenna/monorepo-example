@@ -3,7 +3,7 @@
  * MCP server wrapping the monorepo's standard Bazel actions for agents.
  *
  * Tools are deliberately constrained: `run` is allowlist-checked against each
- * project's CLAUDE.md, `query` is read-only, `test` can compute affected via
+ * project's AGENTS.md, `query` is read-only, `test` can compute affected via
  * bazel-diff. Agents that respect these tools stay inside the boundaries the
  * repo enforces in CI; visibility + boundary lint catch them if they don't.
  */
@@ -46,14 +46,14 @@ async function listProjectDirs(): Promise<string[]> {
 
 async function readProjectClaude(rel: string): Promise<string | null> {
   try {
-    return await readFile(path.join(REPO_ROOT, rel, "CLAUDE.md"), "utf8");
+    return await readFile(path.join(REPO_ROOT, rel, "AGENTS.md"), "utf8");
   } catch {
     return null;
   }
 }
 
 function parseAllowedTargets(claude: string, project: string): string[] {
-  // Match `bazel run|build|test //...` references inside the CLAUDE.md.
+  // Match `bazel run|build|test //...` references inside the AGENTS.md.
   const re = /bazel (?:run|build|test) (\/\/[^\s`)]+)/g;
   const targets = new Set<string>();
   for (const m of claude.matchAll(re)) {
@@ -77,7 +77,7 @@ const server = new Server(
 const tools = [
   {
     name: "list_projects",
-    description: "List all apps and libs with their CLAUDE.md summary.",
+    description: "List all apps and libs with their AGENTS.md summary.",
     inputSchema: { type: "object", properties: {} },
   },
   {
@@ -121,7 +121,7 @@ const tools = [
   {
     name: "run",
     description:
-      "Run a Bazel target. Restricted to the allowlist parsed from each project's CLAUDE.md.",
+      "Run a Bazel target. Restricted to the allowlist parsed from each project's AGENTS.md.",
     inputSchema: {
       type: "object",
       required: ["target"],
@@ -151,7 +151,7 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       const out: Record<string, string> = {};
       for (const p of projects) {
         const claude = await readProjectClaude(p);
-        out[p] = claude ? claude.split("\n").slice(0, 8).join("\n") : "(no CLAUDE.md)";
+        out[p] = claude ? claude.split("\n").slice(0, 8).join("\n") : "(no AGENTS.md)";
       }
       return { content: [{ type: "text", text: JSON.stringify(out, null, 2) }] };
     }
@@ -202,7 +202,7 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       const allowed = parseAllowedTargets(claude, project);
       if (!allowed.includes(parsed.target.split(":")[0]) && !allowed.includes(parsed.target)) {
         throw new Error(
-          `target ${parsed.target} not in CLAUDE.md allowlist for ${project}: ${allowed.join(", ")}`,
+          `target ${parsed.target} not in AGENTS.md allowlist for ${project}: ${allowed.join(", ")}`,
         );
       }
       const out = await bazel(["run", parsed.target, "--", ...(parsed.args ?? [])]);

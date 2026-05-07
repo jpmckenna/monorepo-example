@@ -15,13 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache bazel disk
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/bazel
-          key: bazel-${{ runner.os }}-${{ hashFiles('MODULE.bazel.lock', 'pnpm-lock.yaml', 'third_party/maven_install.json') }}
-          restore-keys: |
-            bazel-${{ runner.os }}-
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -34,16 +27,22 @@ jobs:
       - name: pnpm install
         run: pnpm install
 
-      - name: bazel test //...
+      - name: bazel build and test //...
         env:
           BB_KEY: ${{ secrets.BB_KEY }}
         run: |
           if [ -n "$BB_KEY" ]; then
+            bazel build //... \
+              --remote_cache=grpcs://remote.buildbuddy.io \
+              --remote_header=x-buildbuddy-api-key="$BB_KEY" \
+              --bes_backend=grpcs://remote.buildbuddy.io \
+              --bes_results_url=https://app.buildbuddy.io/invocation/
             bazel test //... \
               --remote_cache=grpcs://remote.buildbuddy.io \
               --remote_header=x-buildbuddy-api-key="$BB_KEY" \
               --bes_backend=grpcs://remote.buildbuddy.io \
               --bes_results_url=https://app.buildbuddy.io/invocation/
           else
+            bazel build //...
             bazel test //...
           fi
