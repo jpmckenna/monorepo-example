@@ -2,6 +2,7 @@ export interface Product {
   sku: string;
   price: string;
   currency: string;
+  inventoryCount: number;
 }
 
 const CATALOG_BASE_URL =

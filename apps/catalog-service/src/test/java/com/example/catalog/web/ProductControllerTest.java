@@ -19,7 +19,8 @@ class ProductControllerTest {
     mvc.perform(get("/products/ABC-123"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.sku").value("ABC-123"))
-        .andExpect(jsonPath("$.currency").value("USD"));
+        .andExpect(jsonPath("$.currency").value("USD"))
+        .andExpect(jsonPath("$.inventoryCount").value(3));
   }
 
   @Test
