@@ -1,5 +1,7 @@
 # monorepo-example
 
+[![ci](https://github.com/jpmckenna/monorepo-example/actions/workflows/ci.yml/badge.svg)](https://github.com/jpmckenna/monorepo-example/actions/workflows/ci.yml)
+
 A Bazel-based polyglot monorepo proof-of-concept for an enterprise React + Java
 Spring Boot ecommerce org. The POC demonstrates four things a monorepo migration
 should buy you:
